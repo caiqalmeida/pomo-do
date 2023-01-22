@@ -1,5 +1,5 @@
-import { Heading, Box } from "@chakra-ui/react";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
+import { Heading, Box, Button } from "@chakra-ui/react";
 
 import ToDoItem from "./ToDoItem";
 
@@ -29,23 +29,61 @@ const mockedItems = [
 
 const ToDoList = () => {
   const [items, setItems] = useState(mockedItems);
+  const [filtredItems, setFiltredItems] = useState(mockedItems);
+  const [focusMode, setFocusMode] = useState(false);
 
-  const handleToggleDone = (id: number) => {
+  const handleToggleDone = (
+    event: MouseEvent<HTMLButtonElement>,
+    id: number
+  ) => {
+    event.stopPropagation();
     const newItems = items.map((item) =>
       item.id === id ? { ...item, done: !item.done } : item
     );
+    console.log("newItems", newItems);
 
     setItems(newItems);
   };
 
+  const handleFocusModeOn = (id: number) => {
+    setFiltredItems(items.filter((item) => item.id === id));
+    setFocusMode(true);
+  };
+
+  const handleFocusModeOff = () => {
+    setFiltredItems(items);
+    setFocusMode(false);
+  };
+
   return (
-    <Box bg="purple.500" mt={12} p={8} borderRadius="lg">
+    <Box
+      bg="purple.500"
+      mt={12}
+      p={8}
+      borderRadius="lg"
+      display="flex"
+      flexDirection="column"
+    >
+      {focusMode && (
+        <Button
+          position="absolute"
+          variant="outline"
+          onClick={() => handleFocusModeOff()}
+        >
+          X
+        </Button>
+      )}
       <Heading size="2xl" textAlign="center" color="purple.700" mb="8">
-        Do
+        {focusMode ? "Doing" : "Do"}
       </Heading>
 
-      {items.map((item) => (
-        <ToDoItem key={item.id} item={item} onToggle={handleToggleDone} />
+      {filtredItems.map((item) => (
+        <ToDoItem
+          key={item.id}
+          item={item}
+          onToggleDone={handleToggleDone}
+          onFocusModeOn={handleFocusModeOn}
+        />
       ))}
     </Box>
   );
