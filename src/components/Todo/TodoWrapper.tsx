@@ -1,7 +1,10 @@
-import { MouseEvent, useState } from "react";
+import { useState, MouseEvent } from "react";
 import { Heading, Box, Button } from "@chakra-ui/react";
 
-import ToDoItem from "./ToDoItem";
+import { useTodo } from "contexts/todo";
+import { ITodoItem } from "types";
+import ToDoItem from "./TodoItem";
+import ToDoList from "./TodoList";
 
 const mockedItems = [
   {
@@ -27,33 +30,24 @@ const mockedItems = [
   },
 ];
 
-const ToDoList = () => {
+const TodoWrapper = () => {
   const [items, setItems] = useState(mockedItems);
-  const [filtredItems, setFiltredItems] = useState(mockedItems);
-  const [focusMode, setFocusMode] = useState(false);
+  const { focusMode, handleFocusModeOff, focusedItemId } = useTodo();
 
   const handleToggleDone = (
     event: MouseEvent<HTMLButtonElement>,
     id: number
   ) => {
     event.stopPropagation();
-    const newItems = items.map((item) =>
+    const newItems = items.map((item: ITodoItem) =>
       item.id === id ? { ...item, done: !item.done } : item
     );
-    console.log("newItems", newItems);
 
     setItems(newItems);
   };
 
-  const handleFocusModeOn = (id: number) => {
-    setFiltredItems(items.filter((item) => item.id === id));
-    setFocusMode(true);
-  };
-
-  const handleFocusModeOff = () => {
-    setFiltredItems(items);
-    setFocusMode(false);
-  };
+  const focusedItem =
+    items.find((item) => item.id === focusedItemId) || undefined;
 
   return (
     <Box
@@ -77,16 +71,12 @@ const ToDoList = () => {
         {focusMode ? "Doing" : "Do"}
       </Heading>
 
-      {filtredItems.map((item) => (
-        <ToDoItem
-          key={item.id}
-          item={item}
-          onToggleDone={handleToggleDone}
-          onFocusModeOn={handleFocusModeOn}
-        />
-      ))}
+      {focusMode && focusedItem && (
+        <ToDoItem item={focusedItem} onToggleDone={handleToggleDone} />
+      )}
+      {!focusMode && <ToDoList items={items} onToggleDone={handleToggleDone} />}
     </Box>
   );
 };
 
-export default ToDoList;
+export default TodoWrapper;

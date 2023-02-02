@@ -1,20 +1,18 @@
-import { Box, Text, Button } from "@chakra-ui/react";
 import { MouseEvent } from "react";
+import { Box, Text, Button } from "@chakra-ui/react";
 import { AiFillCheckCircle as CheckIcon } from "react-icons/ai";
 
-interface ToDoItemProps {
-  item: {
-    id: number;
-    title: string;
-    done: boolean;
-  };
-  onFocusModeOn: (id: number) => void;
+import { ITodoItem } from "../../types";
+import { useTodo } from "contexts/todo";
+
+interface Props {
+  item: ITodoItem;
   onToggleDone: (event: MouseEvent<HTMLButtonElement>, id: number) => void;
 }
 
-const ToDoItem = ({ item, onToggleDone, onFocusModeOn }: ToDoItemProps) => {
-  console.log("item.id", item.id);
-  console.log("item.done", item.done);
+const ToDoItem = ({ item, onToggleDone }: Props) => {
+  const { handleFocusModeOn } = useTodo();
+
   return (
     <Box
       bg="purple.600"
@@ -24,8 +22,9 @@ const ToDoItem = ({ item, onToggleDone, onFocusModeOn }: ToDoItemProps) => {
       p="4"
       display="flex"
       alignItems="center"
-      color={item.done ? "#553C9A" : "#fefefe"}
-      onClick={() => onFocusModeOn(item.id)}
+      color={item?.done ? "#553C9A" : "#fefefe"}
+      onClick={() => handleFocusModeOn(item.id)}
+      cursor="pointer"
     >
       <Button
         onClick={(event) => {
